@@ -10,9 +10,13 @@ An implementation of BERT-based multi-label text classification for forum thread
 ```
 bert_classification/
 ├── dataset/                   # Raw data (JSON files)
+├── splits/                    # Official Zenodo train/test split
+│   ├── train_branches.txt
+│   └── test_branches.txt
 ├── processed_data/            # Processed training/test data
 ├── data_processor.py          # Data preprocessing module
 ├── bert_trainer.py            # BERT training module
+├── tfidf_baseline.py          # TF-IDF + Logistic Regression baseline
 ├── predictor.py               # Inference module
 ├── evaluate.py                # Evaluation module
 ├── main.py                    # Main training script
@@ -96,11 +100,40 @@ Download the dataset from [Zenodo](https://zenodo.org/records/17091284) and plac
 
 ## 🚀 Quick Start
 
-Run the complete training pipeline with automatic timestamp folders:
+Run the complete BERT training pipeline with automatic timestamp folders:
 
 ```bash
 python main.py
 ```
+
+Run the TF-IDF + Logistic Regression **baseline** as a separate pipeline:
+
+```bash
+python tfidf_baseline.py
+```
+
+Both scripts share the same data, config, and output folder structure. Key CLI options for the baseline:
+
+| Flag | Default | Description |
+|---|---|---|
+| `--text-field` | from `config.py` | `text` or `insight_summary` |
+| `--target-field` | from `config.py` | `topics`, `branch_status`, `branch_type`, `overall_thread_sentiment` |
+| `--max-features` | `50000` | TF-IDF vocabulary size |
+| `--ngram-max` | `2` | Upper n-gram bound (1 = unigrams, 2 = unigrams+bigrams) |
+| `--C` | `1.0` | Logistic Regression regularisation strength |
+| `--skip-data-processing` | off | Load existing `processed_data/` without re-processing |
+| `--data-split` | off | Create a new train/test split |
+| `--use-official-split` | off | Use the official Zenodo split (requires `--data-split`) |
+| `--splits-dir` | `splits` | Path to `train_branches.txt` / `test_branches.txt` |
+
+To use the **official Zenodo split** (recommended for reproducibility):
+
+```bash
+python tfidf_baseline.py --data-split --use-official-split
+python main.py --data-split --use-official-split
+```
+
+To compare TF-IDF and BERT side by side, use `TFIDFBaseline.print_comparison()` / `plot_comparison()` programmatically after both runs.
 
 This will:
 - Create a timestamp folder (e.g., `outputs/20250118_143052/`)

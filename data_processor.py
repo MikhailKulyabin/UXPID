@@ -326,13 +326,16 @@ class ForumDataProcessor:
         
         return analysis
     
-    def prepare_for_training(self, test_size: float = None, random_state: int = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def prepare_for_training(self, test_size: float = None, random_state: int = None,
+                             splits_dir: str = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Prepare data for training by encoding labels and splitting.
         
         Args:
             test_size: Fraction of data to use for testing (defaults to config)
             random_state: Random seed for reproducibility (defaults to config)
+            splits_dir: Path to directory containing train_branches.txt / test_branches.txt.
+                        When provided, the official split is used instead of a random split.
             
         Returns:
             Tuple of (train_df, test_df)
@@ -405,13 +408,43 @@ class ForumDataProcessor:
             if np.any(labels_per_sample != 1):
                 print(f"Warning: Some samples have {np.unique(labels_per_sample)} labels. Expected exactly 1 for {self.target_field}.")
         
-        # Split the data with fixed random state for reproducibility
-        train_df, test_df = train_test_split(
-            df_with_labels, 
-            test_size=test_size, 
-            random_state=random_state,
-            stratify=None  # Can't stratify multi-label directly
-        )
+        # Split the data
+        if splits_dir:
+            train_ids_file = os.path.join(splits_dir, "train_branches.txt")
+            test_ids_file  = os.path.join(splits_dir, "test_branches.txt")
+            if os.path.exists(train_ids_file) and os.path.exists(test_ids_file):
+                print(f"Using official split from '{splits_dir}'")
+                with open(train_ids_file) as f:
+                    train_ids = set(line.strip() for line in f if line.strip())
+                with open(test_ids_file) as f:
+                    test_ids = set(line.strip() for line in f if line.strip())
+                
+                branch_col = df_with_labels['branch_id'].astype(str)
+                train_df = df_with_labels[branch_col.isin(train_ids)].copy()
+                test_df  = df_with_labels[branch_col.isin(test_ids)].copy()
+                
+                # Samples not assigned to either split go to train
+                both = train_ids | test_ids
+                unassigned = df_with_labels[~branch_col.isin(both)]
+                if len(unassigned) > 0:
+                    print(f"Warning: {len(unassigned)} samples not in official split, appending to train")
+                    train_df = pd.concat([train_df, unassigned], ignore_index=True)
+                
+                print(f"Official split  — train: {len(train_df)}, test: {len(test_df)}")
+            else:
+                print(f"Warning: split files not found in '{splits_dir}', falling back to random split")
+                train_df, test_df = train_test_split(
+                    df_with_labels, test_size=test_size,
+                    random_state=random_state, stratify=None
+                )
+        else:
+            # Random split
+            train_df, test_df = train_test_split(
+                df_with_labels,
+                test_size=test_size,
+                random_state=random_state,
+                stratify=None  # Can't stratify multi-label directly
+            )
         
         # Add split information for tracking
         train_df = train_df.copy()
@@ -779,7 +812,7 @@ class ForumDataProcessor:
             # Single-label classification for branch_status, branch_type, or overall_thread_sentiment - sort alphabetically
             ordered_classes = sorted(list(all_labels))
         
-        print(f"Built encoder for target '{self.target_field}'" with {len(ordered_classes)} classes: {ordered_classes}")
+        print(f"Built encoder for target '{self.target_field}' with {len(ordered_classes)} classes: {ordered_classes}")
         
         # Initialize the MultiLabelBinarizer with the ordered classes
         self.mlb.classes_ = np.array(ordered_classes)
@@ -807,7 +840,8 @@ class ForumDataProcessor:
         print(f"Saved encoder and class info for target '{self.target_field}' to {output_dir}/")
     
     def get_or_create_training_data(self, data_split: bool = None, 
-                                   data_dir: str = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
+                                   data_dir: str = None,
+                                   splits_dir: str = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Get existing training data or create new split based on configuration.
         
@@ -815,6 +849,9 @@ class ForumDataProcessor:
             data_split: Whether to create new split (True) or use existing only (False). 
                        If None, uses config default.
             data_dir: Directory containing processed data (defaults to config)
+            splits_dir: Path to official split txt files. When provided together with
+                        data_split=True, the official split is used instead of a random one.
+                        Defaults to DATA_CONFIG["splits_dir"] when available.
             
         Returns:
             Tuple of (train_df, test_df)
@@ -823,6 +860,8 @@ class ForumDataProcessor:
             data_split = DATA_CONFIG["data_split"]
         if data_dir is None:
             data_dir = DATA_CONFIG["processed_data_dir"]
+        if splits_dir is None:
+            splits_dir = DATA_CONFIG.get("splits_dir")  # may be None if not set
             
         existing_data_available = os.path.exists(data_dir)
         
@@ -877,7 +916,7 @@ class ForumDataProcessor:
         if self.df is None:
             self.create_dataframe()
             
-        train_df, test_df = self.prepare_for_training()
+        train_df, test_df = self.prepare_for_training(splits_dir=splits_dir)
         
         # Save the processed data for future use
         self.save_processed_data(train_df, test_df, data_dir)

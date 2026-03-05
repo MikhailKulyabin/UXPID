@@ -2,6 +2,7 @@
 DATA_CONFIG = {
     "dataset_path": "dataset",               # Path to dataset directory
     "processed_data_dir": "processed_data",  # Directory for processed data
+    "splits_dir": "splits",                  # Path to official train/test split txt files (set to None to use random split)
     "min_text_length": 10,                   # Minimum text length to include
     "max_text_length": 5000,                 # Maximum text length to include
     "min_labels_per_sample": 1,              # Minimum number of labels per sample

@@ -97,6 +97,10 @@ def main():
                        help="Target field for classification: 'topics', 'branch_status', 'branch_type', or 'overall_thread_sentiment'")
     parser.add_argument("--data-split", action="store_true", default=DATA_CONFIG["data_split"],
                        help="Create new data split (train/test). If False, use existing processed data split")
+    parser.add_argument("--use-official-split", action="store_true", default=False,
+                       help="Use the official Zenodo train/test split from splits/ instead of a random split (requires --data-split)")
+    parser.add_argument("--splits-dir", type=str, default=DATA_CONFIG.get("splits_dir", "splits"),
+                       help="Path to directory containing train_branches.txt / test_branches.txt")
     
     # Continue training arguments with config defaults
     continue_group = parser.add_mutually_exclusive_group()
@@ -194,7 +198,10 @@ def main():
                 logger.info("Existing processed data loaded successfully")
             except Exception as e:
                 logger.warning(f"Could not load existing data: {e}. Creating new data...")
-                train_df, test_df = processor.get_or_create_training_data(args.data_split)
+                train_df, test_df = processor.get_or_create_training_data(
+                    args.data_split,
+                    splits_dir=args.splits_dir if args.use_official_split else None
+                )
         else:
             # Load and process data for analysis and/or training data creation
             data = processor.load_data()
@@ -227,7 +234,10 @@ def main():
                 logger.warning(f"Could not create visualizations: {e}")
             
             # Get or create training data based on data_split parameter
-            train_df, test_df = processor.get_or_create_training_data(args.data_split)
+            train_df, test_df = processor.get_or_create_training_data(
+                args.data_split,
+                splits_dir=args.splits_dir if args.use_official_split else None
+            )
         
         # Check if we got training data or if we're in data_split=False mode
         if train_df is None and test_df is None:
