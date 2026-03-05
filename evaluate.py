@@ -46,7 +46,7 @@ class ModelEvaluator:
             data_dir: Directory containing processed data
             text_field: Field to use for evaluation: "text" or "insight_summary"
             topics_file: Path to topics.json for ID to name mapping
-            target_field: Target field used during training (topics, topic_status, topic_type, overall_thread_sentiment)
+            target_field: Target field used during training (topics, branch_status, branch_type, overall_thread_sentiment)
         """
         self.model_path = model_path
         self.data_dir = data_dir
@@ -77,7 +77,7 @@ class ModelEvaluator:
         
         # Convert all label columns back to lists (they were saved as strings)
         import ast
-        label_columns_to_convert = ['topics_labels', 'topic_status_labels', 'topic_type_labels', 'sentiment_labels']
+        label_columns_to_convert = ['topics_labels', 'branch_status_labels', 'branch_type_labels', 'sentiment_labels']
         
         for col in label_columns_to_convert:
             if col in self.test_df.columns:
@@ -152,10 +152,10 @@ class ModelEvaluator:
         else:
             # For binary classification targets, get the single label for each sample
             # Select the appropriate labels column based on target field
-            if self.target_field == "topic_status":
-                labels_column = 'topic_status_labels'
-            elif self.target_field == "topic_type":
-                labels_column = 'topic_type_labels'
+            if self.target_field == "branch_status":
+                labels_column = 'branch_status_labels'
+            elif self.target_field == "branch_type":
+                labels_column = 'branch_type_labels'
             elif self.target_field == "overall_thread_sentiment":
                 labels_column = 'sentiment_labels'
             else:

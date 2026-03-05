@@ -153,7 +153,7 @@ class BERTTrainer:
             dropout_rate: Dropout rate for model regularization
             use_class_weights: Whether to use class weights for loss calculation
             class_weights: Pre-calculated class weights array
-            target_field: Target field for classification (topics, topic_status, etc.)
+            target_field: Target field for classification (topics, branch_status, etc.)
         """
         self.model_name = model_name
         self.max_length = max_length
@@ -251,7 +251,7 @@ class BERTTrainer:
         
         # Convert all label columns back to lists (they were saved as strings)
         import ast
-        label_columns_to_convert = ['topics_labels', 'topic_status_labels', 'topic_type_labels', 'sentiment_labels']
+        label_columns_to_convert = ['topics_labels', 'branch_status_labels', 'branch_type_labels', 'sentiment_labels']
         
         for col in label_columns_to_convert:
             if col in train_df.columns:
@@ -299,10 +299,10 @@ class BERTTrainer:
         # Get the correct labels column based on target field
         if self.target_field == "topics":
             labels_column = 'topics_labels'
-        elif self.target_field == "topic_status":
-            labels_column = 'topic_status_labels'
-        elif self.target_field == "topic_type":
-            labels_column = 'topic_type_labels'
+        elif self.target_field == "branch_status":
+            labels_column = 'branch_status_labels'
+        elif self.target_field == "branch_type":
+            labels_column = 'branch_type_labels'
         elif self.target_field == "overall_thread_sentiment":
             labels_column = 'sentiment_labels'
         else:

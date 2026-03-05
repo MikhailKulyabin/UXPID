@@ -2,6 +2,8 @@
 
 An implementation of BERT-based multi-label text classification for forum thread categorization.
 
+**Dataset:** [UXPID on Zenodo](https://zenodo.org/records/17091284) | **Paper:** [arXiv:2509.11777](https://arxiv.org/abs/2509.11777)
+
 ## 📁 Project Structure
 
 ### Standard Structure
@@ -63,7 +65,7 @@ outputs/
 
 ## 📊 Data Format
 
-The dataset should contain JSON files in the `dataset/` directory. Each JSON file represents a forum thread with the following structure:
+Download the dataset from [Zenodo](https://zenodo.org/records/17091284) and place the JSON files in the `dataset/` directory. Each JSON file represents a forum thread with the following structure:
 
 ```json
 {
@@ -71,8 +73,8 @@ The dataset should contain JSON files in the `dataset/` directory. Each JSON fil
     "branch_id": "1000153386",
     "thread_id": "9520646325", 
     "publication_year": 2021,
-    "topic_status": "Unsolved",
-    "topic_type": "question"
+    "branch_status": "Unsolved",
+    "branch_type": "question"
   },
   "content": [
     {
@@ -167,6 +169,12 @@ TRAINING_CONFIG = {
 }
 ```
 
+## AI Use Disclosure
+
+The **UXPID corpus** was created with the assistance of AI tools. For full details, see the paper: [arXiv:2509.11777](https://arxiv.org/abs/2509.11777). Specifically, the `analysis` fields present in each JSON record — including `insight_summary`, `user_expectations`, `severity_expectation_level`, `gain_keywords`, `pain_keywords`, `feature_keywords`, and `overall_thread_sentiment` — were generated using a large language model (LLM). These AI-generated annotations were produced by prompting the model to analyse the raw forum thread content and extract structured UX-relevant insights.
+
+The raw forum content (`content` field) was artificially synthesized and anonymized from branches originally extracted from a public industrial automation forum. Thread metadata (`metadata` field) was derived from the same source.
+
 ## 📝 Requirements
 
 - Python 3.8+
@@ -175,3 +183,16 @@ TRAINING_CONFIG = {
 - CUDA-capable GPU (recommended)
 - 8GB+ RAM
 - 2GB+ GPU memory
+
+## 📄 Citation
+
+If you use this dataset or code in your research, please cite the paper: [arXiv:2509.11777](https://arxiv.org/abs/2509.11777)
+
+```bibtex
+@article{kulyabin2025user,
+  title={User eXperience Perception Insights Dataset (UXPID): Synthetic User Feedback from Public Industrial Forums},
+  author={Kulyabin, Mikhail and Joosten, Jan and Pacheco, Nuno Miguel Martins and Ries, Fabian and Petridis, Filippos and Bosch, Jan and Olsson, Helena Holmstr{\"o}m and others},
+  journal={arXiv preprint arXiv:2509.11777},
+  year={2025}
+}
+```

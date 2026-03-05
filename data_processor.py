@@ -22,7 +22,7 @@ class ForumDataProcessor:
         Args:
             dataset_path: Path to the dataset directory containing JSON files (defaults to config)
             topics_file: Path to the topics mapping JSON file (defaults to config)
-            target_field: Target field for classification: "topics", "topic_status", "topic_type", or "overall_thread_sentiment" (defaults to config)
+            target_field: Target field for classification: "topics", "branch_status", "branch_type", or "overall_thread_sentiment" (defaults to config)
         """
         self.dataset_path = dataset_path or DATA_CONFIG["dataset_path"]
         self.topics_file = topics_file or TOPICS_CONFIG["topics_file"]
@@ -127,15 +127,15 @@ class ForumDataProcessor:
             for topic_id in topics.keys():
                 topics_labels.append(topic_id)
         
-        topic_status_labels = []
-        topic_status = metadata.get('topic_status')
-        if topic_status:
-            topic_status_labels.append(topic_status)
+        branch_status_labels = []
+        branch_status = metadata.get('branch_status')
+        if branch_status:
+            branch_status_labels.append(branch_status)
         
-        topic_type_labels = []
-        topic_type = metadata.get('topic_type')
-        if topic_type:
-            topic_type_labels.append(topic_type)
+        branch_type_labels = []
+        branch_type = metadata.get('branch_type')
+        if branch_type:
+            branch_type_labels.append(branch_type)
         
         sentiment_labels = []
         sentiment = analysis.get('overall_thread_sentiment')
@@ -145,14 +145,14 @@ class ForumDataProcessor:
         # For backward compatibility, set topic_labels to the current target
         if self.target_field == "topics":
             current_labels = topics_labels
-        elif self.target_field == "topic_status":
-            current_labels = topic_status_labels
-        elif self.target_field == "topic_type":
-            current_labels = topic_type_labels
+        elif self.target_field == "branch_status":
+            current_labels = branch_status_labels
+        elif self.target_field == "branch_type":
+            current_labels = branch_type_labels
         elif self.target_field == "overall_thread_sentiment":
             current_labels = sentiment_labels
         else:
-            raise ValueError(f"Invalid target_field: {self.target_field}. Must be 'topics', 'topic_status', 'topic_type', or 'overall_thread_sentiment'")
+            raise ValueError(f"Invalid target_field: {self.target_field}. Must be 'topics', 'branch_status', 'branch_type', or 'overall_thread_sentiment'")
         
         return {
             'branch_id': metadata.get('branch_id'),
@@ -160,8 +160,8 @@ class ForumDataProcessor:
             'publication_year': metadata.get('publication_year'),
             'text': merged_text,
             'topics_labels': topics_labels,  # Topic IDs
-            'topic_status_labels': topic_status_labels,  # Status labels
-            'topic_type_labels': topic_type_labels,  # Type labels
+            'branch_status_labels': branch_status_labels,  # Status labels
+            'branch_type_labels': branch_type_labels,  # Type labels
             'sentiment_labels': sentiment_labels,  # Sentiment labels
             'num_comments': len(content),
             'text_length': len(merged_text),
@@ -225,10 +225,10 @@ class ForumDataProcessor:
             # Use the current target's labels column for filtering
             if self.target_field == "topics":
                 labels_column = 'topics_labels'
-            elif self.target_field == "topic_status":
-                labels_column = 'topic_status_labels'
-            elif self.target_field == "topic_type":
-                labels_column = 'topic_type_labels'
+            elif self.target_field == "branch_status":
+                labels_column = 'branch_status_labels'
+            elif self.target_field == "branch_type":
+                labels_column = 'branch_type_labels'
             elif self.target_field == "overall_thread_sentiment":
                 labels_column = 'sentiment_labels'
             else:
@@ -276,10 +276,10 @@ class ForumDataProcessor:
         # Label analysis based on current target field
         if self.target_field == "topics":
             labels_column = 'topics_labels'
-        elif self.target_field == "topic_status":
-            labels_column = 'topic_status_labels'
-        elif self.target_field == "topic_type":
-            labels_column = 'topic_type_labels'
+        elif self.target_field == "branch_status":
+            labels_column = 'branch_status_labels'
+        elif self.target_field == "branch_type":
+            labels_column = 'branch_type_labels'
         elif self.target_field == "overall_thread_sentiment":
             labels_column = 'sentiment_labels'
         else:
@@ -310,16 +310,16 @@ class ForumDataProcessor:
         analysis['year_distribution'] = year_counts
         
         # Status and type distribution from label columns
-        if 'topic_status_labels' in self.df.columns:
+        if 'branch_status_labels' in self.df.columns:
             status_labels = []
-            for labels in self.df['topic_status_labels']:
+            for labels in self.df['branch_status_labels']:
                 status_labels.extend(labels)
             status_counts = Counter(status_labels)
             analysis['status_distribution'] = dict(status_counts)
         
-        if 'topic_type_labels' in self.df.columns:
+        if 'branch_type_labels' in self.df.columns:
             type_labels = []
-            for labels in self.df['topic_type_labels']:
+            for labels in self.df['branch_type_labels']:
                 type_labels.extend(labels)
             type_counts = Counter(type_labels)
             analysis['type_distribution'] = dict(type_counts)
@@ -348,10 +348,10 @@ class ForumDataProcessor:
         # Select the appropriate labels column based on target field
         if self.target_field == "topics":
             labels_column = 'topics_labels'
-        elif self.target_field == "topic_status":
-            labels_column = 'topic_status_labels'
-        elif self.target_field == "topic_type":
-            labels_column = 'topic_type_labels'
+        elif self.target_field == "branch_status":
+            labels_column = 'branch_status_labels'
+        elif self.target_field == "branch_type":
+            labels_column = 'branch_type_labels'
         elif self.target_field == "overall_thread_sentiment":
             labels_column = 'sentiment_labels'
         else:
@@ -377,12 +377,12 @@ class ForumDataProcessor:
             # Multi-label classification for topics - sort numerically
             ordered_classes = sorted([label for label in all_labels], key=int)
         else:
-            # Single-label classification for topic_status, topic_type, or overall_thread_sentiment - sort alphabetically
+            # Single-label classification for branch_status, branch_type, or overall_thread_sentiment - sort alphabetically
             ordered_classes = sorted(list(all_labels))
         
         print(f"Found {len(ordered_classes)} unique labels: {ordered_classes}")
         
-        # For single-label classification (topic_status, topic_type, overall_thread_sentiment), 
+        # For single-label classification (branch_status, branch_type, overall_thread_sentiment), 
         # we still use MultiLabelBinarizer for consistency, but each sample will have only one label
         self.mlb.classes_ = np.array(ordered_classes)
         
@@ -400,7 +400,7 @@ class ForumDataProcessor:
                     encoded_labels[i, class_to_index[label]] = 1
         
         # For single-label classification, verify each sample has exactly one label
-        if self.target_field in ["topic_status", "topic_type", "overall_thread_sentiment"]:
+        if self.target_field in ["branch_status", "branch_type", "overall_thread_sentiment"]:
             labels_per_sample = encoded_labels.sum(axis=1)
             if np.any(labels_per_sample != 1):
                 print(f"Warning: Some samples have {np.unique(labels_per_sample)} labels. Expected exactly 1 for {self.target_field}.")
@@ -444,10 +444,10 @@ class ForumDataProcessor:
         # Select the appropriate labels column based on target field
         if self.target_field == "topics":
             labels_column = 'topics_labels'
-        elif self.target_field == "topic_status":
-            labels_column = 'topic_status_labels'
-        elif self.target_field == "topic_type":
-            labels_column = 'topic_type_labels'
+        elif self.target_field == "branch_status":
+            labels_column = 'branch_status_labels'
+        elif self.target_field == "branch_type":
+            labels_column = 'branch_type_labels'
         elif self.target_field == "overall_thread_sentiment":
             labels_column = 'sentiment_labels'
         else:
@@ -523,10 +523,10 @@ class ForumDataProcessor:
         # Use the current target's labels column
         if self.target_field == "topics":
             labels_column = 'topics_labels'
-        elif self.target_field == "topic_status":
-            labels_column = 'topic_status_labels'
-        elif self.target_field == "topic_type":
-            labels_column = 'topic_type_labels'
+        elif self.target_field == "branch_status":
+            labels_column = 'branch_status_labels'
+        elif self.target_field == "branch_type":
+            labels_column = 'branch_type_labels'
         elif self.target_field == "overall_thread_sentiment":
             labels_column = 'sentiment_labels'
         else:
@@ -551,14 +551,14 @@ class ForumDataProcessor:
         axes[1, 0].tick_params(axis='x', rotation=45)
         
         # Topic status distribution
-        if 'topic_status_labels' in self.df.columns:
+        if 'branch_status_labels' in self.df.columns:
             status_labels = []
-            for labels in self.df['topic_status_labels']:
+            for labels in self.df['branch_status_labels']:
                 status_labels.extend(labels)
             if status_labels:
                 status_counts = Counter(status_labels)
                 axes[1, 1].pie(status_counts.values(), labels=status_counts.keys(), autopct='%1.1f%%')
-            axes[1, 1].set_title('Topic Status Distribution')
+            axes[1, 1].set_title('Branch Status Distribution')
         else:
             axes[1, 1].text(0.5, 0.5, 'No Status Data', ha='center', va='center', transform=axes[1, 1].transAxes)
         
@@ -725,7 +725,7 @@ class ForumDataProcessor:
         
         # Convert all label columns back to lists (they were saved as strings)
         import ast
-        label_columns_to_convert = ['topics_labels', 'topic_status_labels', 'topic_type_labels', 'sentiment_labels']
+        label_columns_to_convert = ['topics_labels', 'branch_status_labels', 'branch_type_labels', 'sentiment_labels']
         
         for col in label_columns_to_convert:
             if col in train_df.columns:
@@ -746,10 +746,10 @@ class ForumDataProcessor:
         # Select the appropriate labels column based on target field
         if self.target_field == "topics":
             labels_column = 'topics_labels'
-        elif self.target_field == "topic_status":
-            labels_column = 'topic_status_labels'
-        elif self.target_field == "topic_type":
-            labels_column = 'topic_type_labels'
+        elif self.target_field == "branch_status":
+            labels_column = 'branch_status_labels'
+        elif self.target_field == "branch_type":
+            labels_column = 'branch_type_labels'
         elif self.target_field == "overall_thread_sentiment":
             labels_column = 'sentiment_labels'
         else:
@@ -776,10 +776,10 @@ class ForumDataProcessor:
             # Multi-label classification for topics - sort numerically
             ordered_classes = sorted([label for label in all_labels], key=int)
         else:
-            # Single-label classification for topic_status, topic_type, or overall_thread_sentiment - sort alphabetically
+            # Single-label classification for branch_status, branch_type, or overall_thread_sentiment - sort alphabetically
             ordered_classes = sorted(list(all_labels))
         
-        print(f"Built encoder for target '{self.target_field}' with {len(ordered_classes)} classes: {ordered_classes}")
+        print(f"Built encoder for target '{self.target_field}'" with {len(ordered_classes)} classes: {ordered_classes}")
         
         # Initialize the MultiLabelBinarizer with the ordered classes
         self.mlb.classes_ = np.array(ordered_classes)
@@ -847,7 +847,7 @@ class ForumDataProcessor:
                         
                         # Convert label columns back to lists
                         import ast
-                        for col in ['topics_labels', 'topic_status_labels', 'topic_type_labels', 'sentiment_labels']:
+                        for col in ['topics_labels', 'branch_status_labels', 'branch_type_labels', 'sentiment_labels']:
                             if col in train_df.columns:
                                 train_df[col] = train_df[col].apply(ast.literal_eval)
                                 test_df[col] = test_df[col].apply(ast.literal_eval)

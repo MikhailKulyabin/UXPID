@@ -7,7 +7,7 @@ DATA_CONFIG = {
     "min_labels_per_sample": 1,              # Minimum number of labels per sample
     "clean_text": True,                      # Whether to apply text cleaning
     "text_field": "insight_summary",         # Input to use for training: "text" or "insight_summary"
-    "target_field": "topics",                # Target field for classification: "topics", "topic_status", "topic_type", or "overall_thread_sentiment"
+    "target_field": "topics",                # Target field for classification: "topics", "branch_status", "branch_type", or "overall_thread_sentiment"
     "data_split": False,                     # Whether to create new data split (True) or use existing split (False)
 }
 
