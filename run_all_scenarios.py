@@ -1,4 +1,4 @@
-﻿"""
+"""
 Run all four validation scenarios for the TF-IDF baseline.
 
 Scenarios:
@@ -120,8 +120,8 @@ def main():
     SCENARIOS = [
         ("topics",                   "insight_summary"),
         ("topics",                   "text"),
-        ("overall_thread_sentiment", "insight_summary"),
-        ("overall_thread_sentiment", "text"),
+        ("overall_branch_sentiment", "insight_summary"),
+        ("overall_branch_sentiment", "text"),
     ]
 
     all_results = {}
@@ -192,7 +192,7 @@ def main():
     # Console summary
     # ------------------------------------------------------------------
     print("\n" + "=" * 90)
-    print("  ALL SCENARIOS — Test Metrics Summary")
+    print("  ALL SCENARIOS � Test Metrics Summary")
     print("=" * 90)
     header = (
         f"  {'Task':<30} {'F1 macro':>9} {'F1 micro':>9} "

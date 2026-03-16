@@ -303,7 +303,7 @@ class BERTTrainer:
             labels_column = 'branch_status_labels'
         elif self.target_field == "branch_type":
             labels_column = 'branch_type_labels'
-        elif self.target_field == "overall_thread_sentiment":
+        elif self.target_field == "overall_branch_sentiment":
             labels_column = 'sentiment_labels'
         else:
             raise ValueError(f"Unknown target field: {self.target_field}")

@@ -46,7 +46,7 @@ class ModelEvaluator:
             data_dir: Directory containing processed data
             text_field: Field to use for evaluation: "text" or "insight_summary"
             topics_file: Path to topics.json for ID to name mapping
-            target_field: Target field used during training (topics, branch_status, branch_type, overall_thread_sentiment)
+            target_field: Target field used during training (topics, branch_status, branch_type, overall_branch_sentiment)
         """
         self.model_path = model_path
         self.data_dir = data_dir
@@ -156,7 +156,7 @@ class ModelEvaluator:
                 labels_column = 'branch_status_labels'
             elif self.target_field == "branch_type":
                 labels_column = 'branch_type_labels'
-            elif self.target_field == "overall_thread_sentiment":
+            elif self.target_field == "overall_branch_sentiment":
                 labels_column = 'sentiment_labels'
             else:
                 raise ValueError(f"Unknown target field: {self.target_field}")

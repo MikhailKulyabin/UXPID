@@ -92,9 +92,9 @@ def main():
     parser.add_argument("--text-field", choices=["text", "insight_summary"], 
                        default=DATA_CONFIG["text_field"],
                        help="Field to use for training: 'text' or 'insight_summary'")
-    parser.add_argument("--target-field", choices=["topics", "branch_status", "branch_type", "overall_thread_sentiment"], 
+    parser.add_argument("--target-field", choices=["topics", "branch_status", "branch_type", "overall_branch_sentiment"], 
                        default=DATA_CONFIG["target_field"],
-                       help="Target field for classification: 'topics', 'branch_status', 'branch_type', or 'overall_thread_sentiment'")
+                       help="Target field for classification: 'topics', 'branch_status', 'branch_type', or 'overall_branch_sentiment'")
     parser.add_argument("--data-split", action="store_true", default=DATA_CONFIG["data_split"],
                        help="Create new data split (train/test). If False, use existing processed data split")
     parser.add_argument("--use-official-split", action="store_true", default=False,

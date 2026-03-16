@@ -22,7 +22,7 @@ class ForumDataProcessor:
         Args:
             dataset_path: Path to the dataset directory containing JSON files (defaults to config)
             topics_file: Path to the topics mapping JSON file (defaults to config)
-            target_field: Target field for classification: "topics", "branch_status", "branch_type", or "overall_thread_sentiment" (defaults to config)
+            target_field: Target field for classification: "topics", "branch_status", "branch_type", or "overall_branch_sentiment" (defaults to config)
         """
         self.dataset_path = dataset_path or DATA_CONFIG["dataset_path"]
         self.topics_file = topics_file or TOPICS_CONFIG["topics_file"]
@@ -138,7 +138,7 @@ class ForumDataProcessor:
             branch_type_labels.append(branch_type)
         
         sentiment_labels = []
-        sentiment = analysis.get('overall_thread_sentiment')
+        sentiment = analysis.get('overall_branch_sentiment')
         if sentiment:
             sentiment_labels.append(sentiment)
         
@@ -149,10 +149,10 @@ class ForumDataProcessor:
             current_labels = branch_status_labels
         elif self.target_field == "branch_type":
             current_labels = branch_type_labels
-        elif self.target_field == "overall_thread_sentiment":
+        elif self.target_field == "overall_branch_sentiment":
             current_labels = sentiment_labels
         else:
-            raise ValueError(f"Invalid target_field: {self.target_field}. Must be 'topics', 'branch_status', 'branch_type', or 'overall_thread_sentiment'")
+            raise ValueError(f"Invalid target_field: {self.target_field}. Must be 'topics', 'branch_status', 'branch_type', or 'overall_branch_sentiment'")
         
         return {
             'branch_id': metadata.get('branch_id'),
@@ -229,7 +229,7 @@ class ForumDataProcessor:
                 labels_column = 'branch_status_labels'
             elif self.target_field == "branch_type":
                 labels_column = 'branch_type_labels'
-            elif self.target_field == "overall_thread_sentiment":
+            elif self.target_field == "overall_branch_sentiment":
                 labels_column = 'sentiment_labels'
             else:
                 labels_column = 'topics_labels'  # Default fallback
@@ -280,7 +280,7 @@ class ForumDataProcessor:
             labels_column = 'branch_status_labels'
         elif self.target_field == "branch_type":
             labels_column = 'branch_type_labels'
-        elif self.target_field == "overall_thread_sentiment":
+        elif self.target_field == "overall_branch_sentiment":
             labels_column = 'sentiment_labels'
         else:
             labels_column = 'topics_labels'  # Default fallback
@@ -355,7 +355,7 @@ class ForumDataProcessor:
             labels_column = 'branch_status_labels'
         elif self.target_field == "branch_type":
             labels_column = 'branch_type_labels'
-        elif self.target_field == "overall_thread_sentiment":
+        elif self.target_field == "overall_branch_sentiment":
             labels_column = 'sentiment_labels'
         else:
             # Use the specific labels column directly
@@ -380,12 +380,12 @@ class ForumDataProcessor:
             # Multi-label classification for topics - sort numerically
             ordered_classes = sorted([label for label in all_labels], key=int)
         else:
-            # Single-label classification for branch_status, branch_type, or overall_thread_sentiment - sort alphabetically
+            # Single-label classification for branch_status, branch_type, or overall_branch_sentiment - sort alphabetically
             ordered_classes = sorted(list(all_labels))
         
         print(f"Found {len(ordered_classes)} unique labels: {ordered_classes}")
         
-        # For single-label classification (branch_status, branch_type, overall_thread_sentiment), 
+        # For single-label classification (branch_status, branch_type, overall_branch_sentiment), 
         # we still use MultiLabelBinarizer for consistency, but each sample will have only one label
         self.mlb.classes_ = np.array(ordered_classes)
         
@@ -403,7 +403,7 @@ class ForumDataProcessor:
                     encoded_labels[i, class_to_index[label]] = 1
         
         # For single-label classification, verify each sample has exactly one label
-        if self.target_field in ["branch_status", "branch_type", "overall_thread_sentiment"]:
+        if self.target_field in ["branch_status", "branch_type", "overall_branch_sentiment"]:
             labels_per_sample = encoded_labels.sum(axis=1)
             if np.any(labels_per_sample != 1):
                 print(f"Warning: Some samples have {np.unique(labels_per_sample)} labels. Expected exactly 1 for {self.target_field}.")
@@ -481,7 +481,7 @@ class ForumDataProcessor:
             labels_column = 'branch_status_labels'
         elif self.target_field == "branch_type":
             labels_column = 'branch_type_labels'
-        elif self.target_field == "overall_thread_sentiment":
+        elif self.target_field == "overall_branch_sentiment":
             labels_column = 'sentiment_labels'
         else:
             labels_column = 'topics_labels'  # Default fallback
@@ -560,7 +560,7 @@ class ForumDataProcessor:
             labels_column = 'branch_status_labels'
         elif self.target_field == "branch_type":
             labels_column = 'branch_type_labels'
-        elif self.target_field == "overall_thread_sentiment":
+        elif self.target_field == "overall_branch_sentiment":
             labels_column = 'sentiment_labels'
         else:
             labels_column = 'topics_labels'  # Default fallback
@@ -783,7 +783,7 @@ class ForumDataProcessor:
             labels_column = 'branch_status_labels'
         elif self.target_field == "branch_type":
             labels_column = 'branch_type_labels'
-        elif self.target_field == "overall_thread_sentiment":
+        elif self.target_field == "overall_branch_sentiment":
             labels_column = 'sentiment_labels'
         else:
             # Default to topics
@@ -809,7 +809,7 @@ class ForumDataProcessor:
             # Multi-label classification for topics - sort numerically
             ordered_classes = sorted([label for label in all_labels], key=int)
         else:
-            # Single-label classification for branch_status, branch_type, or overall_thread_sentiment - sort alphabetically
+            # Single-label classification for branch_status, branch_type, or overall_branch_sentiment - sort alphabetically
             ordered_classes = sorted(list(all_labels))
         
         print(f"Built encoder for target '{self.target_field}' with {len(ordered_classes)} classes: {ordered_classes}")

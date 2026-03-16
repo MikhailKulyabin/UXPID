@@ -6,7 +6,7 @@ the BERTTrainer interface so it can be used as a drop-in comparison in main.py.
 
 Supports:
   - Multi-label classification  (target_field == "topics")
-  - Single-label classification (branch_status, branch_type, overall_thread_sentiment)
+  - Single-label classification (branch_status, branch_type, overall_branch_sentiment)
 """
 
 import os
@@ -97,7 +97,7 @@ class TFIDFBaseline:
         DataFrame column to use as input (``"text"`` or ``"insight_summary"``).
     target_field : str
         Label column: ``"topics"``, ``"branch_status"``, ``"branch_type"``,
-        or ``"overall_thread_sentiment"``.
+        or ``"overall_branch_sentiment"``.
     max_features : int
         Maximum number of TF-IDF features.
     ngram_range : tuple
@@ -116,7 +116,7 @@ class TFIDFBaseline:
         "topics": "topics_labels",
         "branch_status": "branch_status_labels",
         "branch_type": "branch_type_labels",
-        "overall_thread_sentiment": "sentiment_labels",
+        "overall_branch_sentiment": "sentiment_labels",
     }
 
     def __init__(
@@ -517,7 +517,7 @@ class TFIDFBaseline:
         tf_label = "Summary" if self.text_field == "insight_summary" else "Comments"
         tgt_label = {
             "topics": "Topic",
-            "overall_thread_sentiment": "Sentiment",
+            "overall_branch_sentiment": "Sentiment",
             "branch_status": "Branch Status",
             "branch_type": "Branch Type",
         }.get(self.target_field, self.target_field)
@@ -891,7 +891,7 @@ def main():
                         default=DATA_CONFIG["text_field"],
                         help="Input field to use for training")
     parser.add_argument("--target-field",
-                        choices=["topics", "branch_status", "branch_type", "overall_thread_sentiment"],
+                        choices=["topics", "branch_status", "branch_type", "overall_branch_sentiment"],
                         default=DATA_CONFIG["target_field"],
                         help="Target label field")
     parser.add_argument("--data-split", action="store_true",

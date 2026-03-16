@@ -117,7 +117,7 @@ Both scripts share the same data, config, and output folder structure. Key CLI o
 | Flag | Default | Description |
 |---|---|---|
 | `--text-field` | from `config.py` | `text` or `insight_summary` |
-| `--target-field` | from `config.py` | `topics`, `branch_status`, `branch_type`, `overall_thread_sentiment` |
+| `--target-field` | from `config.py` | `topics`, `branch_status`, `branch_type`, `overall_branch_sentiment` |
 | `--max-features` | `50000` | TF-IDF vocabulary size |
 | `--ngram-max` | `2` | Upper n-gram bound (1 = unigrams, 2 = unigrams+bigrams) |
 | `--C` | `1.0` | Logistic Regression regularisation strength |
@@ -204,7 +204,7 @@ TRAINING_CONFIG = {
 
 ## AI Use Disclosure
 
-The **UXPID corpus** was created with the assistance of AI tools. For full details, see the paper: [arXiv:2509.11777](https://arxiv.org/abs/2509.11777). Specifically, the `analysis` fields present in each JSON record — including `insight_summary`, `user_expectations`, `severity_expectation_level`, `gain_keywords`, `pain_keywords`, `feature_keywords`, and `overall_thread_sentiment` — were generated using a large language model (LLM). These AI-generated annotations were produced by prompting the model to analyse the raw forum thread content and extract structured UX-relevant insights.
+The **UXPID corpus** was created with the assistance of AI tools. For full details, see the paper: [arXiv:2509.11777](https://arxiv.org/abs/2509.11777). Specifically, the `analysis` fields present in each JSON record — including `insight_summary`, `user_expectations`, `severity_expectation_level`, `gain_keywords`, `pain_keywords`, `feature_keywords`, and `overall_branch_sentiment` — were generated using a large language model (LLM). These AI-generated annotations were produced by prompting the model to analyse the raw forum thread content and extract structured UX-relevant insights.
 
 The raw forum content (`content` field) was artificially synthesized and anonymized from branches originally extracted from a public industrial automation forum. Thread metadata (`metadata` field) was derived from the same source.
 
